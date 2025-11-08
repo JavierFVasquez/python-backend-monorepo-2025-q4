@@ -1,0 +1,62 @@
+name: Test Coverage
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Pants
+        run: |
+          curl -L -o ./pants https://pantsbuild.github.io/setup/pants
+          chmod +x ./pants
+
+      - name: Run tests with coverage
+        run: |
+          make test-pants
+
+      - name: Upload coverage report to GitHub Pages
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/coverage/python/htmlcov
+          destination_dir: coverage
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: dist/coverage/python/htmlcov/
+          retention-days: 30
+
+      - name: Generate coverage badge
+        run: |
+          COVERAGE=$(python -c "import json; data=json.load(open('dist/coverage/python/coverage.json')); print(round(data['totals']['percent_covered']))")
+          echo "Coverage: ${COVERAGE}%"
+          echo "COVERAGE=${COVERAGE}" >> $GITHUB_ENV
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const coverage = process.env.COVERAGE;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 📊 Coverage Report\n\nTotal Coverage: **${coverage}%**\n\n[View Full Report](https://${context.repo.owner}.github.io/${context.repo.repo}/coverage/)`
+            });

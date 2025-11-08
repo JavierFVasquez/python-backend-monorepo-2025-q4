@@ -1,0 +1,35 @@
+name: Test Coverage with Codecov
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Pants
+        run: |
+          curl -L -o ./pants https://pantsbuild.github.io/setup/pants
+          chmod +x ./pants
+
+      - name: Run tests with coverage
+        run: |
+          make test-pants
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./dist/coverage/python/coverage.json
+          fail_ci_if_error: false
+          verbose: true

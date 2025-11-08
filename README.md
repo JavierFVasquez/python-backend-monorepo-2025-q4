@@ -1,6 +1,13 @@
 # Python Backend Monorepo
 
+[![Test Coverage](https://github.com/JavierFVasquez/python-backend-monorepo-2025-q4/actions/workflows/coverage.yml/badge.svg)](https://github.com/JavierFVasquez/python-backend-monorepo-2025-q4/actions/workflows/coverage.yml)
+[![codecov](https://codecov.io/gh/JavierFVasquez/python-backend-monorepo-2025-q4/branch/main/graph/badge.svg)](https://codecov.io/gh/JavierFVasquez/python-backend-monorepo-2025-q4)
+
 A scalable Python monorepo containing two microservices (`products` and `inventory`) built with FastAPI, following hexagonal architecture and JSON:API standard.
+
+## 📊 Coverage Report
+
+View the latest test coverage report: [Coverage Report](https://JavierFVasquez.github.io/python-backend-monorepo-2025-q4/coverage/)
 
 ## Architecture Overview
 
@@ -165,8 +172,17 @@ make docker-down   # Detener
 ### Ejecutar Tests
 
 ```bash
-make test
+make test          # Ejecutar tests con pytest
+make test-pants    # Ejecutar tests con Pants + coverage report
+
+# Ver reporte de coverage HTML
+open dist/coverage/python/htmlcov/index.html
 ```
+
+**Reportes generados:**
+- 📊 HTML: `dist/coverage/python/htmlcov/index.html` - Reporte visual interactivo
+- 📄 JSON: `dist/coverage/python/coverage.json` - Datos estructurados
+- 🌐 GitHub Pages: Se publica automáticamente en cada push a main/master
 
 ## 📚 Documentation
 
