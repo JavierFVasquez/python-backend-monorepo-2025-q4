@@ -46,8 +46,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
-    lifespan=lifespan,
-    redirect_slashes=False,  # Evita redirecciones 307 por trailing slashes
+    lifespan=lifespan
 )
 
 # CORS configuration - usar variables de entorno en producción
