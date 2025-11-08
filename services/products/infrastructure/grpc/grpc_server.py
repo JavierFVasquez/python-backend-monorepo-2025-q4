@@ -46,7 +46,7 @@ class ProductsServicer(products_pb2_grpc.ProductsServiceServicer):
         try:
             product = await self.get_product_use_case.execute(request.product_id)
 
-            logger.info(f"GetProduct called from Inventory for product_id={request.product_id} with request_id={context.request_id}") # Just for demonstration purposes
+            logger.info(f"GetProduct called from Inventory for product_id={request.product_id}")
 
             return products_pb2.GetProductResponse(
                 product=products_pb2.Product(
@@ -54,6 +54,7 @@ class ProductsServicer(products_pb2_grpc.ProductsServiceServicer):
                     name=product.name,
                     description=product.description or "",
                     price=str(product.price),
+                    images=product.images if product.images else [],
                     created_at=product.created_at.isoformat(),
                     updated_at=product.updated_at.isoformat(),
                 )
@@ -85,6 +86,7 @@ class ProductsServicer(products_pb2_grpc.ProductsServiceServicer):
                         name=product.name,
                         description=product.description or "",
                         price=str(product.price),
+                        images=product.images if product.images else [],
                         created_at=product.created_at.isoformat(),
                         updated_at=product.updated_at.isoformat(),
                     ),
@@ -117,6 +119,7 @@ class ProductsServicer(products_pb2_grpc.ProductsServiceServicer):
                         name=p.name,
                         description=p.description or "",
                         price=str(p.price),
+                        images=p.images if p.images else [],
                         created_at=p.created_at.isoformat(),
                         updated_at=p.updated_at.isoformat(),
                     )
@@ -150,5 +153,6 @@ async def serve_grpc(repository: ProductRepository, port: int = 50051) -> None:
 
     logger.info(f"Starting gRPC server on port {port}")
     await server.start()
+    logger.info(f"✅ gRPC server successfully started and listening on port {port}")
     await server.wait_for_termination()
 

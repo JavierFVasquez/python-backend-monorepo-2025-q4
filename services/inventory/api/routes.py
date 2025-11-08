@@ -92,6 +92,10 @@ async def create_inventory(
                                     "name": "Laptop Dell XPS 15",
                                     "description": "High-performance laptop",
                                     "price": "1299.99",
+                                    "images": [
+                                        "https://i.imgur.com/3Qnm0Wj.png",
+                                        "https://i.imgur.com/xKZJ6mF.png"
+                                    ],
                                 },
                                 "created_at": "2025-11-08T10:30:00",
                                 "updated_at": "2025-11-08T10:30:00",

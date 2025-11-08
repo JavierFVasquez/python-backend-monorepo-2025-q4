@@ -21,9 +21,24 @@ poetry run python -m grpc_tools.protoc \
   --grpc_python_out=./services/products/infrastructure/grpc \
   proto/products/products.proto
 
+# Generar para Inventory service
+poetry run python -m grpc_tools.protoc \
+  -I./proto \
+  --python_out=./services/inventory/infrastructure/grpc \
+  --grpc_python_out=./services/inventory/infrastructure/grpc \
+  proto/products/products.proto
+
+# Arreglar imports (absolutos → relativos)
+sed -i '' 's/from products import products_pb2/from . import products_pb2/g' \
+  services/products/infrastructure/grpc/products/products_pb2_grpc.py
+sed -i '' 's/from products import products_pb2/from . import products_pb2/g' \
+  services/inventory/infrastructure/grpc/products/products_pb2_grpc.py
+
 echo "✅ Protobuf code generated successfully!"
 echo ""
 echo "Generated files:"
 echo "  - services/products/infrastructure/grpc/products/products_pb2.py"
 echo "  - services/products/infrastructure/grpc/products/products_pb2_grpc.py"
+echo "  - services/inventory/infrastructure/grpc/products/products_pb2.py"
+echo "  - services/inventory/infrastructure/grpc/products/products_pb2_grpc.py"
 

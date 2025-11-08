@@ -1,19 +1,35 @@
-version: '3.9'
+version: "3.9"
 
 services:
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - backend
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: redis
+  #   ports:
+  #     - "6379:6379"
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - backend
 
+  # mongodb:
+  #   image: mongo:7
+  #   container_name: mongodb
+  #   ports:
+  #     - "27017:27017"
+  #   environment:
+  #     MONGO_INITDB_DATABASE: inventory_db
+  #   healthcheck:
+  #     test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   volumes:
+  #     - mongodb_data:/data/db
+  #   networks:
+  #     - backend
   postgres:
     image: postgres:16-alpine
     container_name: postgres
@@ -33,43 +49,26 @@ services:
     networks:
       - backend
 
-  mongodb:
-    image: mongo:7
-    container_name: mongodb
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_DATABASE: inventory_db
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - backend
-
   products:
     build:
       context: .
       dockerfile: services/products/Dockerfile
     container_name: products
     ports:
-      - "8001:8001"
-      - "50051:50051"
+      - "8101:8001"
+      - "50151:50051"
     environment:
       - API_KEY=${API_KEY}
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/products_db
-      - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=${REDIS_URL}
       - PRODUCTS_SERVICE_PORT=8001
       - PRODUCTS_GRPC_PORT=50051
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
-        condition: service_healthy
+      # redis:
+      #   condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
       interval: 30s
@@ -85,17 +84,17 @@ services:
       dockerfile: services/inventory/Dockerfile
     container_name: inventory
     ports:
-      - "8002:8002"
+      - "8102:8002"
     environment:
       - API_KEY=${API_KEY}
-      - MONGODB_URI=mongodb://mongodb:27017
-      - MONGODB_DATABASE=inventory_db
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_DATABASE=${MONGODB_DATABASE:-inventory_db}
       - PRODUCTS_GRPC_URL=products:50051
       - INVENTORY_SERVICE_PORT=8002
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     depends_on:
-      mongodb:
-        condition: service_healthy
+      # mongodb:
+      #   condition: service_healthy
       products:
         condition: service_healthy
     healthcheck:
@@ -113,5 +112,4 @@ networks:
 
 volumes:
   postgres_data:
-  mongodb_data:
-
+  # mongodb_data:

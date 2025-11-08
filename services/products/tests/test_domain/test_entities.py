@@ -10,6 +10,7 @@ def test_product_creation() -> None:
         name="Test Product",
         description="Test Description",
         price=Decimal("99.99"),
+        images=["https://i.imgur.com/test.png"],
         created_at=datetime(2024, 1, 1),
         updated_at=datetime(2024, 1, 1),
     )
@@ -18,6 +19,7 @@ def test_product_creation() -> None:
     assert product.name == "Test Product"
     assert product.description == "Test Description"
     assert product.price == Decimal("99.99")
+    assert product.images == ["https://i.imgur.com/test.png"]
 
 
 def test_product_to_dict() -> None:
@@ -26,6 +28,7 @@ def test_product_to_dict() -> None:
         name="Test Product",
         description="Test Description",
         price=Decimal("99.99"),
+        images=["https://i.imgur.com/test.png"],
         created_at=datetime(2024, 1, 1, 12, 0, 0),
         updated_at=datetime(2024, 1, 1, 12, 0, 0),
     )
@@ -35,6 +38,7 @@ def test_product_to_dict() -> None:
     assert product_dict["id"] == "123"
     assert product_dict["name"] == "Test Product"
     assert product_dict["price"] == "99.99"
+    assert product_dict["images"] == ["https://i.imgur.com/test.png"]
     assert "created_at" in product_dict
     assert "updated_at" in product_dict
 

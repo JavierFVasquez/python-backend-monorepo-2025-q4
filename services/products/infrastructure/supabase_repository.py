@@ -24,6 +24,7 @@ class SupabaseProductRepository(ProductRepository):
             name=product_data["name"],
             description=product_data["description"],
             price=Decimal(str(product_data["price"])),
+            images=product_data.get("images", []),
             created_at=now,
             updated_at=now,
         )
@@ -60,6 +61,8 @@ class SupabaseProductRepository(ProductRepository):
             product_model.description = product_data["description"]
         if "price" in product_data:
             product_model.price = Decimal(str(product_data["price"]))
+        if "images" in product_data:
+            product_model.images = product_data["images"]
 
         product_model.updated_at = datetime.utcnow()
 
@@ -101,6 +104,7 @@ class SupabaseProductRepository(ProductRepository):
             name=model.name,
             description=model.description,
             price=model.price,
+            images=model.images if model.images else [],
             created_at=model.created_at,
             updated_at=model.updated_at,
         )

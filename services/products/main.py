@@ -25,6 +25,16 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 logger = setup_logging(SERVICE_NAME, LOG_LEVEL)
 
 
+async def run_grpc_server() -> None:
+    """Run gRPC server in background."""
+    grpc_port = int(os.getenv("PRODUCTS_GRPC_PORT", 50051))
+    # Create a long-lived session for gRPC server
+    session = async_session_maker()
+    repository = SupabaseProductRepository(session)
+    logger.info(f"Starting gRPC server on port {grpc_port}")
+    await serve_grpc(repository, grpc_port)
+
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     """Lifespan event handler for startup and shutdown."""
@@ -33,10 +43,18 @@ async def lifespan(_app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
+    # Start gRPC server in background
+    grpc_task = asyncio.create_task(run_grpc_server())
+
     yield
 
     # Shutdown
     logger.info(f"{SERVICE_NAME} service shutting down")
+    grpc_task.cancel()
+    try:
+        await grpc_task
+    except asyncio.CancelledError:
+        pass
     await engine.dispose()
 
 
@@ -70,16 +88,6 @@ async def health_check() -> dict[str, str]:
         "http_port": os.getenv("PRODUCTS_SERVICE_PORT", "8001"),
         "grpc_port": os.getenv("PRODUCTS_GRPC_PORT", "50051"),
     }
-
-
-async def run_grpc_server() -> None:
-    """Run gRPC server in background."""
-    grpc_port = int(os.getenv("PRODUCTS_GRPC_PORT", 50051))
-    # Create a long-lived session for gRPC server
-    session = async_session_maker()
-    repository = SupabaseProductRepository(session)
-    logger.info(f"Starting gRPC server on port {grpc_port}")
-    await serve_grpc(repository, grpc_port)
 
 
 if __name__ == "__main__":

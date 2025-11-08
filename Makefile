@@ -1,4 +1,4 @@
-.PHONY: help install test lint format run-products run-inventory docker-up docker-down db-up db-down clean proto migrate migrate-create migrate-rollback migrate-history seed seed-clear
+.PHONY: help install test lint format run-products run-inventory docker-up docker-down db-up db-down clean proto migrate migrate-create migrate-rollback migrate-history seed seed-clear seed-inventory seed-inventory-clear seed-all
 
 help:
 	@echo "📦 Comandos Disponibles"
@@ -7,7 +7,9 @@ help:
 	@echo "  make install           - Instalar pyenv, Poetry y dependencias"
 	@echo "  make proto             - Generar código desde archivos .proto"
 	@echo "  make migrate           - Ejecutar migraciones de BD"
-	@echo "  make seed              - Insertar datos de prueba"
+	@echo "  make seed              - Insertar datos de prueba (productos)"
+	@echo "  make seed-inventory    - Insertar datos de prueba (inventario)"
+	@echo "  make seed-all          - Insertar datos en todas las BD"
 	@echo ""
 	@echo "🧪 Testing:"
 	@echo "  make test              - Run tests (Poetry)"
@@ -73,14 +75,29 @@ migrate-history:
 	@echo "📜 Migration history:"
 	@export PATH="$$HOME/.local/bin:$$PATH" && eval "$$(pyenv init -)" && cd services/products && poetry run alembic history
 
-# Database Seeds
+# Database Seeds - Products (PostgreSQL)
 seed:
-	@echo "🌱 Seeding database with test data..."
+	@echo "🌱 Seeding products database with test data..."
 	@export PATH="$$HOME/.local/bin:$$PATH" && eval "$$(pyenv init -)" && cd services/products && poetry run python -m seeds.seed_products
 
 seed-clear:
-	@echo "🗑️  Clearing database..."
+	@echo "🗑️  Clearing products database..."
 	@export PATH="$$HOME/.local/bin:$$PATH" && eval "$$(pyenv init -)" && cd services/products && poetry run python -m seeds.seed_products --clear
+
+# Database Seeds - Inventory (MongoDB)
+seed-inventory:
+	@echo "🌱 Seeding inventory database with test data..."
+	@export PATH="$$HOME/.local/bin:$$PATH" && eval "$$(pyenv init -)" && cd services/inventory && poetry run python -m seeds.seed_inventory --real
+
+seed-inventory-clear:
+	@echo "🗑️  Clearing inventory database..."
+	@export PATH="$$HOME/.local/bin:$$PATH" && eval "$$(pyenv init -)" && cd services/inventory && poetry run python -m seeds.seed_inventory --clear
+
+# Seed all databases
+seed-all:
+	@echo "🌱 Seeding all databases..."
+	@make seed
+	@make seed-inventory
 
 # Tests principales (Poetry - recomendado para desarrollo)
 test:

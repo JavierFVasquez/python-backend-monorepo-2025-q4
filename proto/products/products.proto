@@ -55,7 +55,8 @@ message Product {
   string name = 2;
   string description = 3;
   string price = 4;  // Decimal as string
-  string created_at = 5;
-  string updated_at = 6;
+  repeated string images = 5;  // Array of image URLs
+  string created_at = 6;
+  string updated_at = 7;
 }
 

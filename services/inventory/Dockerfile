@@ -1,28 +1,22 @@
-FROM python:3.11-slim as builder
-
-WORKDIR /app
-
-RUN pip install --no-cache-dir pants==2.19.0
-
-COPY pants.toml BUILD pyproject.toml ./
-COPY 3rdparty ./3rdparty
-COPY libs ./libs
-COPY services/inventory ./services/inventory
-
-RUN pants export --resolve=python-default
-
 FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY --from=builder /app/dist/export/python/virtualenvs/python-default /opt/venv
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc g++ curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy and install Python dependencies
+COPY 3rdparty/python/requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt && rm /tmp/requirements.txt
+
+# Copy application code
 COPY libs ./libs
 COPY services/inventory ./services/inventory
 
-ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHONPATH=/app
 
 EXPOSE 8002
 
 CMD ["python", "-m", "uvicorn", "services.inventory.main:app", "--host", "0.0.0.0", "--port", "8002"]
-

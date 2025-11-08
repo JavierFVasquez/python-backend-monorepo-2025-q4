@@ -12,6 +12,10 @@ class ProductCreate(BaseModel):
                 "name": "Laptop Dell XPS 15",
                 "description": "High-performance laptop with Intel Core i7 processor, 16GB RAM, and 512GB SSD",
                 "price": 1299.99,
+                "images": [
+                    "https://placehold.co/600x400/png",
+                    "https://placehold.co/600x400/png"
+                ]
             }
         }
     )
@@ -35,6 +39,11 @@ class ProductCreate(BaseModel):
         description="Product price in USD (must be greater than 0)",
         examples=[1299.99],
     )
+    images: list[str] = Field(
+        default_factory=list,
+        description="Array of product image URLs (PNG or WEBP with transparent background)",
+        examples=[["https://placehold.co/600x400/png"]],
+    )
 
 
 class ProductUpdate(BaseModel):
@@ -45,6 +54,7 @@ class ProductUpdate(BaseModel):
             "example": {
                 "name": "Laptop Dell XPS 15 (Updated)",
                 "price": 1199.99,
+                "images": ["https://placehold.co/600x400/png"]
             }
         }
     )
@@ -67,5 +77,10 @@ class ProductUpdate(BaseModel):
         gt=0,
         description="Updated product price in USD (must be greater than 0)",
         examples=[1199.99],
+    )
+    images: list[str] | None = Field(
+        None,
+        description="Updated array of product image URLs (PNG or WEBP with transparent background)",
+        examples=[["https://placehold.co/600x400/png"]],
     )
 

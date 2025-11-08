@@ -13,6 +13,7 @@ def sample_product() -> Product:
         name="Test Product",
         description="Test Description",
         price=Decimal("99.99"),
+        images=["https://i.imgur.com/test1.png", "https://i.imgur.com/test2.png"],
         created_at=datetime(2024, 1, 1, 12, 0, 0),
         updated_at=datetime(2024, 1, 1, 12, 0, 0),
     )

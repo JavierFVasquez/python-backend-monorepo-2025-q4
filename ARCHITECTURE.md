@@ -4,36 +4,90 @@
 
 This project follows the hexagonal architecture pattern to ensure clean separation of concerns and maintainability.
 
-### Layer Structure
+### Layer Structure - Hexagonal Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        API Layer                             │
-│  - FastAPI Routes                                            │
-│  - Request/Response Schemas (Pydantic)                       │
-│  - JSON:API Serializers                                      │
-└──────────────────────┬───────────────────────────────────────┘
-                       │
-┌──────────────────────▼───────────────────────────────────────┐
-│                   Application Layer                          │
-│  - Use Cases (Business Logic)                                │
-│  - Orchestration                                             │
-└──────────────────────┬───────────────────────────────────────┘
-                       │
-┌──────────────────────▼───────────────────────────────────────┐
-│                    Domain Layer                              │
-│  - Entities (Business Objects)                               │
-│  - Ports (Interfaces/Abstractions)                           │
-└──────────────────────┬───────────────────────────────────────┘
-                       │
-┌──────────────────────▼───────────────────────────────────────┐
-│                 Infrastructure Layer                         │
-│  - Adapters (Implementations of Ports)                       │
-│  - Database Repositories                                     │
-│  - External Service Clients                                  │
-│  - Cache Implementations                                     │
-└─────────────────────────────────────────────────────────────┘
+                    DRIVING ADAPTERS (Puertos de Entrada)
+              ┌──────────────────┬──────────────────┐
+              │   FastAPI REST   │   gRPC Server    │
+              │   (Clientes)     │  (Inter-service) │
+              └────────┬─────────┴────────┬─────────┘
+                       │                  │
+                       ▼                  ▼
+       ┌───────────────────────────────────────────────────┐
+       │              API LAYER (Adapters)                 │
+       │  - HTTP Routes (FastAPI)                          │
+       │  - gRPC Servicers                                 │
+       │  - Request/Response Schemas (Pydantic)            │
+       │  - JSON:API Serializers                           │
+       │  - Protocol Buffers (protobuf)                    │
+       └───────────────────────┬───────────────────────────┘
+                               │
+       ┌───────────────────────▼───────────────────────────┐
+       │         APPLICATION LAYER (Use Cases)             │
+       │  - CreateProduct, GetProduct, UpdateProduct       │
+       │  - GetInventory, UpdateInventory                  │
+       │  - Business Logic Orchestration                   │
+       │  - Uses Domain Entities & Ports                   │
+       └───────────────────────┬───────────────────────────┘
+                               │
+       ┌───────────────────────▼───────────────────────────┐
+       │         DOMAIN LAYER (Core Business)              │
+       │  ┌──────────────────┬──────────────────┐          │
+       │  │    ENTITIES      │      PORTS       │          │
+       │  │  (Value Objects) │   (Interfaces)   │          │
+       │  ├──────────────────┼──────────────────┤          │
+       │  │  - Product       │  - ProductRepo   │          │
+       │  │  - Inventory     │  - InventoryRepo │          │
+       │  │                  │  - ProductSvcPort│          │
+       │  │                  │  - CachePort     │          │
+       │  └──────────────────┴──────────────────┘          │
+       └───────────────────────┬───────────────────────────┘
+                               │
+       ┌───────────────────────▼───────────────────────────┐
+       │      INFRASTRUCTURE LAYER (Adapters)              │
+       │  ┌────────────────────────────────────────────┐   │
+       │  │         DRIVEN ADAPTERS (Salida)           │   │
+       │  ├────────────────────────────────────────────┤   │
+       │  │  - SupabaseRepository (PostgreSQL)         │   │
+       │  │  - MongoDBRepository                       │   │
+       │  │  - RedisCache                              │   │
+       │  │  - ProductsGrpcClient (gRPC Client)        │   │
+       │  └────────────────────────────────────────────┘   │
+       └───────────────────────────────────────────────────┘
+                               │
+                               ▼
+                    DRIVEN SYSTEMS (External)
+              ┌──────────────────┬──────────────────┐
+              │   PostgreSQL     │     MongoDB      │
+              │   (Supabase)     │   (Atlas)        │
+              │                  │                  │
+              │     Redis        │  Products gRPC   │
+              │   (Cache)        │   Service        │
+              └──────────────────┴──────────────────┘
 ```
+
+**Explicación de las capas:**
+
+1. **API Layer (Driving Adapters)**: 
+   - Adaptadores de entrada que reciben requests externos
+   - REST API para clientes (FastAPI + JSON:API)
+   - gRPC Server para comunicación inter-servicios
+
+2. **Application Layer**: 
+   - Casos de uso que implementan la lógica de negocio
+   - Orquestan el flujo entre Domain e Infrastructure
+   - Son independientes del framework
+
+3. **Domain Layer**: 
+   - Núcleo de la aplicación con entidades y reglas de negocio
+   - Ports (interfaces) que definen contratos
+   - NO tiene dependencias externas
+
+4. **Infrastructure Layer (Driven Adapters)**: 
+   - Implementaciones concretas de los Ports
+   - Adaptadores de salida (repositories, clients, cache)
+   - Detalles técnicos de persistencia y comunicación
 
 ### Benefits
 
@@ -44,34 +98,96 @@ This project follows the hexagonal architecture pattern to ensure clean separati
 
 ## Service Communication
 
-### Products ←→ Inventory
+### Products ←→ Inventory (gRPC)
 
-The inventory service communicates with the products service via HTTP:
+Los servicios se comunican mediante gRPC para comunicación inter-service de alta performance:
 
 ```
-┌──────────────┐     HTTP Request      ┌──────────────┐
-│              │  ──────────────────►  │              │
-│  Inventory   │  X-API-Key Header     │   Products   │
-│   Service    │  X-Request-ID         │   Service    │
-│              │  ◄──────────────────  │              │
-└──────────────┘    JSON:API Response  └──────────────┘
+┌──────────────────┐                        ┌──────────────────┐
+│                  │                        │                  │
+│   Inventory      │                        │    Products      │
+│   Service        │                        │    Service       │
+│                  │                        │                  │
+│  ┌────────────┐  │                        │  ┌────────────┐  │
+│  │ gRPC Client│  │   gRPC Request         │  │ gRPC Server│  │
+│  │ (Driven    │──┼────────────────────────►  │ (Driving   │  │
+│  │  Adapter)  │  │   products:50051       │  │  Adapter)  │  │
+│  │            │  │                        │  │            │  │
+│  │            │  │   Metadata:            │  │            │  │
+│  │            │  │   - x-request-id       │  │            │  │
+│  │            │◄─┼────────────────────────┼──│            │  │
+│  └────────────┘  │   Product Protobuf     │  └────────────┘  │
+│                  │                        │                  │
+└──────────────────┘                        └──────────────────┘
 ```
 
 **Key Features:**
-- API Key authentication for security
-- Request ID propagation for tracing
-- Automatic retries with exponential backoff
-- JSON:API standard responses
+- **Protocol Buffers**: Serialización binaria eficiente y tipado fuerte
+- **Request ID Metadata**: Propagación de request_id vía metadata para tracing
+- **Async/Await**: Cliente y servidor asíncronos usando grpc.aio
+- **Channel Reuse**: Conexiones gRPC persistentes y reutilizables
+- **Error Handling**: Códigos de estado gRPC estándar (NOT_FOUND, INTERNAL, etc.)
+
+**gRPC Service Definition** (`proto/products/products.proto`):
+```protobuf
+service ProductsService {
+  rpc GetProduct(GetProductRequest) returns (GetProductResponse);
+  rpc ProductExists(ProductExistsRequest) returns (ProductExistsResponse);
+  rpc ListProducts(ListProductsRequest) returns (ListProductsResponse);
+}
+```
+
+**Ventajas de gRPC sobre HTTP/REST:**
+- ⚡ **Performance**: ~10x más rápido que REST debido a serialización binaria
+- 🔒 **Type Safety**: Schemas estrictos con Protocol Buffers
+- 🔄 **Streaming**: Soporte nativo para streaming bidireccional
+- 📦 **Payload Pequeño**: Mensajes más compactos que JSON
+- 🌐 **Multi-language**: Generación de código para múltiples lenguajes
+
+### Protocol Buffers (protobuf) - Code Generation
+
+Los archivos `.proto` definen el contrato de comunicación entre servicios:
+
+**Location**: `proto/products/products.proto`
+
+**Generated Python code**:
+- `products_pb2.py`: Mensajes (Product, GetProductRequest, etc.)
+- `products_pb2_grpc.py`: Servicios (ProductsServiceStub, ProductsServiceServicer)
+
+**Regeneration**:
+```bash
+# Generate Python code from proto files
+./scripts/generate_proto.sh
+
+# Or manually:
+python -m grpc_tools.protoc \
+  -I proto \
+  --python_out=. \
+  --grpc_python_out=. \
+  --pyi_out=. \
+  proto/products/products.proto
+```
+
+**Architecture Impact**:
+- Proto files son la **source of truth** para contratos inter-service
+- Los cambios en `.proto` requieren regenerar código en ambos servicios
+- Versionado de APIs se maneja a nivel de protobuf (ej: `products.v1`, `products.v2`)
 
 ## Data Flow Example
 
 ### Creating and Managing Inventory
 
-1. Client creates product in Products service
-2. Products service stores in PostgreSQL (Supabase)
-3. Client creates inventory record in Inventory service
-4. Inventory service validates product exists by calling Products service
-5. Inventory service stores in MongoDB
+1. **Client creates product** → POST /products (Products Service REST API)
+2. **Products service** → Stores in PostgreSQL (Supabase)
+3. **Client creates inventory** → POST /inventory (Inventory Service REST API)
+4. **Inventory service** → Validates product exists via **gRPC call** to Products Service
+   ```
+   Inventory Service → ProductsGrpcClient.product_exists(product_id)
+                    → gRPC: ProductExists(product_id) 
+                    → Products Service gRPC Server
+                    → Returns: {exists: true, product: {...}}
+   ```
+5. **Inventory service** → Stores in MongoDB
 
 ### Purchase Flow (Inventory Update)
 
@@ -139,7 +255,6 @@ Structured JSON logging with correlation:
 }
 ```
 
-Request IDs propagate across services for distributed tracing.
 
 ## Database Schema
 
@@ -171,19 +286,95 @@ CREATE TABLE products (
 
 ## Security
 
-### API Key Authentication
+### Client-to-Service Authentication (REST API)
 
-- Custom header: `X-API-Key`
-- Validated on every request
-- Shared secret between services
+- **API Key Authentication**: Header `X-API-Key`
+- Validated on every HTTP/REST request
 - Returns 401 Unauthorized if invalid
+- Used for external clients accessing REST endpoints
+
+### Service-to-Service Communication (gRPC)
+
+- **Network-level security**: Services within Docker network
+- **Future enhancement**: mTLS (mutual TLS) for production
+- **Request tracing**: Metadata propagation (x-request-id)
 
 ### Environment Variables
 
 All sensitive configuration stored in environment variables:
 - Database credentials
 - API keys
-- Service URLs
+- Service URLs (REST and gRPC)
+
+## Hexagonal Architecture in Practice
+
+### Products Service - Layer Mapping
+
+```
+├── api/                          # API Layer (Driving Adapters)
+│   ├── routes.py                 # FastAPI REST endpoints
+│   ├── schemas.py                # Pydantic request/response models
+│   └── serializers.py            # JSON:API serialization
+│
+├── application/                  # Application Layer (Use Cases)
+│   ├── create_product.py         # CreateProduct use case
+│   ├── get_product.py            # GetProduct use case
+│   ├── update_product.py         # UpdateProduct use case
+│   ├── delete_product.py         # DeleteProduct use case
+│   └── list_products.py          # ListProducts use case
+│
+├── domain/                       # Domain Layer (Core)
+│   ├── entities.py               # Product entity (value object)
+│   └── ports.py                  # Interfaces (ProductRepository, CachePort)
+│
+└── infrastructure/               # Infrastructure Layer (Driven Adapters)
+    ├── database/
+    │   └── models.py             # SQLAlchemy models
+    ├── grpc/
+    │   └── grpc_server.py        # gRPC server adapter
+    ├── supabase_repository.py    # ProductRepository implementation
+    └── redis_cache.py            # CachePort implementation
+```
+
+### Inventory Service - Layer Mapping
+
+```
+├── api/                          # API Layer (Driving Adapters)
+│   ├── routes.py                 # FastAPI REST endpoints
+│   ├── schemas.py                # Pydantic request/response models
+│   └── serializers.py            # JSON:API serialization
+│
+├── application/                  # Application Layer (Use Cases)
+│   ├── get_inventory.py          # GetInventory use case
+│   └── update_inventory.py       # UpdateInventory use case
+│
+├── domain/                       # Domain Layer (Core)
+│   ├── entities.py               # Inventory entity (value object)
+│   └── ports.py                  # Interfaces (InventoryRepository, ProductServicePort)
+│
+└── infrastructure/               # Infrastructure Layer (Driven Adapters)
+    ├── database/
+    │   └── models.py             # MongoDB document models
+    ├── grpc/
+    │   └── products_grpc_client.py  # gRPC client adapter
+    └── mongodb_repository.py     # InventoryRepository implementation
+```
+
+**Flujo de Dependencias (Dependency Rule):**
+
+```
+API Layer ──────► Application Layer ──────► Domain Layer
+    │                    │                        ▲
+    │                    │                        │
+    │                    ▼                        │
+    └──────────► Infrastructure Layer ───────────┘
+                 (implements ports)
+```
+
+- Las dependencias apuntan HACIA ADENTRO
+- Domain NO depende de nadie
+- Infrastructure implementa las interfaces (ports) definidas en Domain
+- Application usa ports del Domain, no conoce implementaciones concretas
 
 ## Observability
 
@@ -204,19 +395,166 @@ Consider adding:
 
 ## Testing Strategy
 
-### Unit Tests
-- Domain entities
-- Use cases with mocked repositories
-- JSON:API serializers
-- Error handling
+### Unit Tests (Isolation)
+- **Domain entities**: Validation, business rules, value objects
+- **Use cases**: With mocked repositories (ports)
+- **JSON:API serializers**: Request/response transformations
+- **Error handling**: Custom exceptions and error responses
+- **gRPC adapters**: With mocked stubs and channels
 
-### Integration Tests
-- API endpoints with test client
-- Database operations (with test DB)
-- Service communication (with mocked HTTP)
+**Example:**
+```python
+# Test use case with mocked repository
+async def test_get_product():
+    mock_repo = Mock(ProductRepository)
+    mock_repo.get_by_id.return_value = Product(...)
+    
+    use_case = GetProduct(mock_repo)
+    result = await use_case.execute("123")
+    
+    assert result.id == "123"
+    mock_repo.get_by_id.assert_called_once_with("123")
+```
 
-### Coverage Target
-- Minimum 80% code coverage
-- Focus on business logic paths
-- Test error scenarios
+### Integration Tests (Components)
+- **REST API endpoints**: With FastAPI TestClient
+- **Database operations**: With test database
+- **gRPC communication**: With test gRPC server/client
+- **Cache operations**: With Redis test instance
+
+**Example:**
+```python
+# Test REST API endpoint
+async def test_create_product_endpoint(client):
+    response = await client.post("/products", json={...})
+    assert response.status_code == 201
+```
+
+### End-to-End Tests (System)
+- **Complete flows**: Product creation → Inventory creation
+- **gRPC inter-service**: Inventory calling Products via gRPC
+- **Error scenarios**: 404s, validation errors, service unavailable
+
+### Test Coverage Targets
+- **Minimum 80%** code coverage overall
+- **90%+** for domain and application layers
+- Focus on:
+  - Business logic paths
+  - Error scenarios
+  - Edge cases
+  - gRPC error handling (NOT_FOUND, UNAVAILABLE, etc.)
+
+## Complete Flow Diagrams
+
+### Sequence Diagram: Create Inventory (End-to-End with gRPC)
+
+```
+┌────────┐         ┌─────────────┐         ┌─────────────┐         ┌──────────┐
+│ Client │         │  Inventory  │         │  Products   │         │ Database │
+│        │         │   Service   │         │   Service   │         │          │
+└───┬────┘         └──────┬──────┘         └──────┬──────┘         └────┬─────┘
+    │                     │                       │                     │
+    │ POST /inventory     │                       │                     │
+    │ X-Request-ID: R1    │                       │                     │
+    │────────────────────►│                       │                     │
+    │                     │                       │                     │
+    │                     │ Validate request      │                     │
+    │                     │ (Pydantic schema)     │                     │
+    │                     │                       │                     │
+    │                     │ gRPC: ProductExists   │                     │
+    │                     │ metadata: x-request-id=R1                   │
+    │                     │──────────────────────►│                     │
+    │                     │                       │                     │
+    │                     │                       │ Query product       │
+    │                     │                       │────────────────────►│
+    │                     │                       │                     │
+    │                     │                       │ Product data        │
+    │                     │                       │◄────────────────────│
+    │                     │                       │                     │
+    │                     │ ProductExistsResponse │                     │
+    │                     │ {exists: true, ...}   │                     │
+    │                     │◄──────────────────────│                     │
+    │                     │                       │                     │
+    │                     │ Create Inventory      │                     │
+    │                     │ entity (domain)       │                     │
+    │                     │                       │                     │
+    │                     │ Save to MongoDB       │                     │
+    │                     │────────────────────────────────────────────►│
+    │                     │                                             │
+    │                     │ Inventory saved                             │
+    │                     │◄────────────────────────────────────────────│
+    │                     │                       │                     │
+    │ 201 Created         │                       │                     │
+    │ JSON:API response   │                       │                     │
+    │◄────────────────────│                       │                     │
+    │                     │                       │                     │
+```
+
+### Architecture Flow: REST + gRPC Integration
+
+```
+External Client
+      │
+      │ REST API (JSON:API)
+      │ Port 8002
+      ▼
+┌─────────────────────────────────────────┐
+│      INVENTORY SERVICE                  │
+│                                         │
+│  ┌──────────────────────────────────┐   │
+│  │  FastAPI Routes (Driving)        │   │
+│  └────────────┬─────────────────────┘   │
+│               │                         │
+│  ┌────────────▼─────────────────────┐   │
+│  │  UpdateInventory Use Case        │   │
+│  └────────────┬─────────────────────┘   │
+│               │                         │
+│         ┌─────┴──────┐                  │
+│         │            │                  │
+│    ┌────▼──────┐ ┌───▼──────────────┐   │
+│    │ Inventory │ │ ProductsGrpcClient│  │
+│    │ Repository│ │ (ProductServicePort│  │
+│    │  (Port)   │ │  implementation)  │   │
+│    └────┬──────┘ └───┬──────────────┘   │
+│         │            │                  │
+└─────────┼────────────┼──────────────────┘
+          │            │
+          │            │ gRPC Call
+          │            │ Port 50051
+          │            ▼
+          │  ┌─────────────────────────────┐
+          │  │   PRODUCTS SERVICE          │
+          │  │                             │
+          │  │ ┌─────────────────────────┐ │
+          │  │ │ gRPC Server (Driving)   │ │
+          │  │ └──────────┬──────────────┘ │
+          │  │            │                │
+          │  │ ┌──────────▼──────────────┐ │
+          │  │ │ GetProduct Use Case     │ │
+          │  │ └──────────┬──────────────┘ │
+          │  │            │                │
+          │  │ ┌──────────▼──────────────┐ │
+          │  │ │ ProductRepository(Port) │ │
+          │  │ └──────────┬──────────────┘ │
+          │  │            │                │
+          │  └────────────┼────────────────┘
+          │               │
+          ▼               ▼
+    MongoDB          PostgreSQL
+    (Atlas)          (Supabase)
+```
+
+### Key Architectural Decisions
+
+| Decision | Technology | Rationale |
+|----------|-----------|-----------|
+| **Inter-service Communication** | gRPC | Performance, type safety, streaming support |
+| **Client API** | REST + JSON:API | Standard, widely adopted, easy integration |
+| **Architecture** | Hexagonal (Ports & Adapters) | Testability, flexibility, maintainability |
+| **Products DB** | PostgreSQL (Supabase) | ACID, relational data, managed service |
+| **Inventory DB** | MongoDB (Atlas) | Document-oriented, flexible schema |
+| **Cache** | Redis | Fast in-memory, TTL support |
+| **Request Tracing** | Request ID propagation | Distributed tracing across services |
+| **Serialization** | Protocol Buffers (gRPC) | Compact, fast, type-safe |
+| **Serialization** | JSON (REST) | Human-readable, standard |
 

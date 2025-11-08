@@ -5,10 +5,11 @@ Este adaptador implementa el puerto ProductServicePort
 usando gRPC para comunicación con Products Service.
 """
 import logging
-from typing import Any
 from decimal import Decimal
+from typing import Any
 
 import grpc
+
 from services.inventory.domain.ports import ProductServicePort
 from services.inventory.infrastructure.grpc.products import (
     products_pb2,
@@ -67,7 +68,7 @@ class ProductsGrpcClient(ProductServicePort):
         """
         try:
             await self._ensure_connection()
-            
+
             if self._stub is None:
                 raise RuntimeError("gRPC stub not initialized")
 
@@ -87,6 +88,7 @@ class ProductsGrpcClient(ProductServicePort):
                 "name": product.name,
                 "description": product.description,
                 "price": Decimal(product.price),
+                "images": list(product.images) if product.images else [],
                 "created_at": product.created_at,
                 "updated_at": product.updated_at,
             }
@@ -98,12 +100,11 @@ class ProductsGrpcClient(ProductServicePort):
                     f"(request_id: {request_id})"
                 )
                 return None
-            else:
-                logger.error(
-                    f"gRPC error getting product {product_id}: {e.code()} - "
-                    f"{e.details()} (request_id: {request_id})"
-                )
-                raise
+            logger.error(
+                f"gRPC error getting product {product_id}: {e.code()} - "
+                f"{e.details()} (request_id: {request_id})"
+            )
+            raise
 
         except Exception as e:
             logger.error(
@@ -124,7 +125,7 @@ class ProductsGrpcClient(ProductServicePort):
         """
         try:
             await self._ensure_connection()
-            
+
             if self._stub is None:
                 raise RuntimeError("gRPC stub not initialized")
 

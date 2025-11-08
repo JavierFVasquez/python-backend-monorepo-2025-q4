@@ -21,6 +21,7 @@ def serialize_inventory(inventory: Inventory, product: dict[str, Any] | None = N
             "id": product.get("id"),
             "name": product.get("name"),
             "description": product.get("description"),
+            "images": product.get("images"),
             "price": product.get("price"),
         }
 

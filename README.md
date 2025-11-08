@@ -4,6 +4,15 @@ A scalable Python monorepo containing two microservices (`products` and `invento
 
 ## Architecture Overview
 
+> 📖 **Para documentación detallada de arquitectura, ver [ARCHITECTURE.md](./ARCHITECTURE.md)**
+>
+> Incluye:
+> - Arquitectura Hexagonal (Ports & Adapters) explicada en detalle
+> - Comunicación gRPC entre servicios con diagramas
+> - Mapeo de capas y flujo de dependencias
+> - Estrategia de testing, logging y caching
+> - Diagramas de secuencia end-to-end
+
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                    API Gateway / Client                       │
@@ -159,7 +168,18 @@ make docker-down   # Detener
 make test
 ```
 
-## 📚 API Documentation
+## 📚 Documentation
+
+### Architecture Documentation
+
+📖 **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Documentación completa de arquitectura:
+- Hexagonal Architecture (Ports & Adapters) con diagramas explícitos
+- Comunicación gRPC inter-servicios
+- Flujo de datos y diagramas de secuencia
+- Estrategias de testing, caching y logging
+- Distributed tracing con Request IDs
+
+### API Documentation
 
 FastAPI genera **automáticamente** documentación OpenAPI/Swagger interactiva para ambos servicios:
 

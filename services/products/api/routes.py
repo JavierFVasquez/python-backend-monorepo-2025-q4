@@ -44,6 +44,10 @@ router = APIRouter(
                                 "name": "Laptop Dell XPS 15",
                                 "description": "High-performance laptop with Intel Core i7 processor",
                                 "price": "1299.99",
+                                "images": [
+                                    "https://i.imgur.com/3Qnm0Wj.png",
+                                    "https://i.imgur.com/xKZJ6mF.png"
+                                ],
                                 "created_at": "2025-11-08T10:30:00",
                                 "updated_at": "2025-11-08T10:30:00",
                             }
@@ -97,6 +101,7 @@ async def create_product(
                                 "name": "Laptop Dell XPS 15",
                                 "description": "High-performance laptop",
                                 "price": "1299.99",
+                                "images": ["https://i.imgur.com/3Qnm0Wj.png"],
                                 "created_at": "2025-11-08T10:30:00",
                                 "updated_at": "2025-11-08T10:30:00",
                             }
@@ -151,6 +156,7 @@ async def get_product(
                                 "name": "Laptop Dell XPS 15 (Updated)",
                                 "description": "High-performance laptop",
                                 "price": "1199.99",
+                                "images": ["https://i.imgur.com/3Qnm0Wj.png"],
                                 "created_at": "2025-11-08T10:30:00",
                                 "updated_at": "2025-11-08T11:45:00",
                             }
@@ -258,6 +264,7 @@ async def delete_product(
                                     "name": "Laptop Dell XPS 15",
                                     "description": "High-performance laptop",
                                     "price": "1299.99",
+                                    "images": ["https://i.imgur.com/3Qnm0Wj.png"],
                                     "created_at": "2025-11-08T10:30:00",
                                     "updated_at": "2025-11-08T10:30:00",
                                 }
@@ -269,6 +276,7 @@ async def delete_product(
                                     "name": "Mouse Logitech MX Master 3",
                                     "description": "Ergonomic wireless mouse",
                                     "price": "99.99",
+                                    "images": ["https://i.imgur.com/pT2WnLk.png"],
                                     "created_at": "2025-11-08T09:15:00",
                                     "updated_at": "2025-11-08T09:15:00",
                                 }
