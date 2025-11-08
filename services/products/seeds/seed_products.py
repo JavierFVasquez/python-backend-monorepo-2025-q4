@@ -25,8 +25,9 @@ SEED_PRODUCTS = [
         "description": "Latest Apple iPhone with A17 Pro chip, 256GB storage, and titanium design",
         "price": Decimal("1199.99"),
         "images": [
-            "https://cdn.dummyjson.com/products/images/smartphones/iPhone%209/1.jpg",
-            "https://cdn.dummyjson.com/products/images/smartphones/iPhone%209/2.jpg",
+            "https://cdn.dummyjson.com/product-images/smartphones/iphone-13-pro/1.webp",
+            "https://cdn.dummyjson.com/product-images/smartphones/iphone-13-pro/2.webp",
+            "https://cdn.dummyjson.com/product-images/smartphones/iphone-13-pro/3.webp",
         ],
     },
     {
@@ -64,8 +65,9 @@ SEED_PRODUCTS = [
         "description": "Samsung flagship with AI features, S Pen, 512GB storage",
         "price": Decimal("1299.99"),
         "images": [
-            "https://cdn.dummyjson.com/products/images/smartphones/Samsung%20Galaxy%20S10/1.jpg",
-            "https://cdn.dummyjson.com/products/images/smartphones/Samsung%20Galaxy%20S10/2.jpg",
+            "https://cdn.dummyjson.com/product-images/smartphones/samsung-galaxy-s7/1.webp",
+            "https://cdn.dummyjson.com/product-images/smartphones/samsung-galaxy-s7/2.webp",
+            "https://cdn.dummyjson.com/product-images/smartphones/samsung-galaxy-s7/3.webp",
         ],
     },
     {
@@ -112,7 +114,9 @@ SEED_PRODUCTS = [
         "description": "Compact drone with 4K HDR video, omnidirectional obstacle sensing",
         "price": Decimal("759.99"),
         "images": [
-            "https://cdn.dummyjson.com/products/images/vehicle/Chevrolet%20Camaro/1.png",
+            "https://cdn.dummyjson.com/product-images/furniture/bedside-table-african-cherry/1.webp",
+            "https://cdn.dummyjson.com/product-images/furniture/bedside-table-african-cherry/2.webp",
+            "https://cdn.dummyjson.com/product-images/furniture/bedside-table-african-cherry/3.webp",
         ],
     },
     {
@@ -130,7 +134,8 @@ SEED_PRODUCTS = [
         "description": "Advanced wireless mouse with ultra-fast scrolling and ergonomic design",
         "price": Decimal("99.99"),
         "images": [
-            "https://cdn.dummyjson.com/products/images/laptops/Alienware%20X17%20R2/1.png",
+            "https://cdn.dummyjson.com/product-images/mobile-accessories/amazon-echo-plus/1.webp",
+            "https://cdn.dummyjson.com/product-images/mobile-accessories/amazon-echo-plus/2.webp",
         ],
     },
     {
@@ -158,7 +163,7 @@ SEED_PRODUCTS = [
         "description": "Premium noise-canceling wireless headphones with superior comfort",
         "price": Decimal("329.99"),
         "images": [
-            "https://cdn.dummyjson.com/products/images/mobile-accessories/Amazon%20Echo%20Dot/1.png",
+            "https://cdn.dummyjson.com/product-images/mobile-accessories/apple-homepod-mini-cosmic-grey/1.webp",
         ],
     },
     {
@@ -177,7 +182,8 @@ SEED_PRODUCTS = [
         "description": "Smart speaker with Alexa, improved audio and temperature sensor",
         "price": Decimal("49.99"),
         "images": [
-            "https://cdn.dummyjson.com/products/images/mobile-accessories/Amazon%20Echo%20Dot/1.png",
+            "https://cdn.dummyjson.com/product-images/mobile-accessories/amazon-echo-plus/1.webp",
+            "https://cdn.dummyjson.com/product-images/mobile-accessories/amazon-echo-plus/2.webp",
         ],
     },
     {
@@ -186,8 +192,9 @@ SEED_PRODUCTS = [
         "description": "Google's flagship phone with AI features, advanced camera, 256GB storage",
         "price": Decimal("999.99"),
         "images": [
-            "https://cdn.dummyjson.com/products/images/smartphones/Google%20Pixel/1.png",
-            "https://cdn.dummyjson.com/products/images/smartphones/Google%20Pixel/2.png",
+            "https://cdn.dummyjson.com/product-images/smartphones/samsung-galaxy-s8/1.webp",
+            "https://cdn.dummyjson.com/product-images/smartphones/samsung-galaxy-s8/2.webp",
+            "https://cdn.dummyjson.com/product-images/smartphones/samsung-galaxy-s8/3.webp",
         ],
     },
     {
@@ -196,7 +203,9 @@ SEED_PRODUCTS = [
         "description": "Mechanical gaming keyboard with RGB lighting and programmable keys",
         "price": Decimal("229.99"),
         "images": [
-            "https://cdn.dummyjson.com/products/images/kitchen-accessories/Cutting%20Board/1.png",
+            "https://cdn.dummyjson.com/product-images/fragrances/gucci-bloom-eau-de/1.webp",
+            "https://cdn.dummyjson.com/product-images/fragrances/gucci-bloom-eau-de/2.webp",
+            "https://cdn.dummyjson.com/product-images/fragrances/gucci-bloom-eau-de/3.webp",
         ],
     },
     {
@@ -242,8 +251,7 @@ SEED_PRODUCTS = [
         "description": "1440p 165Hz gaming monitor with G-SYNC and HDR",
         "price": Decimal("449.99"),
         "images": [
-            "https://cdn.dummyjson.com/products/images/furniture/Bedside%20Table%20African%20Cherry/1.png",
-            "https://cdn.dummyjson.com/products/images/furniture/Bedside%20Table%20African%20Cherry/2.png",
+            "https://cdn.dummyjson.com/product-images/mobile-accessories/tv-studio-camera-pedestal/1.webp",
         ],
     },
     {
@@ -298,8 +306,9 @@ SEED_PRODUCTS = [
         "description": "Business ultrabook with Intel i7, 16GB RAM, 512GB SSD, 14\" display",
         "price": Decimal("1699.99"),
         "images": [
-            "https://cdn.dummyjson.com/products/images/laptops/HP%20Pavilion%2015-DK1056WM/1.png",
-            "https://cdn.dummyjson.com/products/images/laptops/HP%20Pavilion%2015-DK1056WM/2.png",
+            "https://cdn.dummyjson.com/product-images/laptops/lenovo-yoga-920/1.webp",
+            "https://cdn.dummyjson.com/product-images/laptops/lenovo-yoga-920/2.webp",
+            "https://cdn.dummyjson.com/product-images/laptops/lenovo-yoga-920/3.webp",
         ],
     },
     {
@@ -308,7 +317,7 @@ SEED_PRODUCTS = [
         "description": "Dual-band wireless router with WiFi 6, 4 Gigabit LAN ports",
         "price": Decimal("99.99"),
         "images": [
-            "https://cdn.dummyjson.com/products/images/vehicle/Pacifica%20Hybrid/1.png",
+            "https://cdn.dummyjson.com/product-images/mobile-accessories/beats-flex-wireless-earphones/1.webp",
         ],
     },
     {

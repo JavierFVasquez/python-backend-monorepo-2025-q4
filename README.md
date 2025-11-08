@@ -169,6 +169,20 @@ make docker-up     # Levanta servicios + DBs
 make docker-down   # Detener
 ```
 
+### 🐳 Docker Build & Deployment
+
+#### Build Individual Services
+
+```bash
+# Build productos service
+make docker-build-products
+
+# Build inventory service
+make docker-build-inventory
+
+# Build all services
+make docker-build-all
+```
 ### Ejecutar Tests
 
 ```bash
@@ -481,8 +495,16 @@ make lint          # Linters
 make format        # Format código
 
 # Docker
-make docker-up     # Todo junto con Docker
-make db-down       # Detener PostgreSQL local
+make docker-up              # Todo junto con Docker
+make docker-down            # Detener todos los servicios
+make docker-build-products  # Build imagen de products
+make docker-build-inventory # Build imagen de inventory
+make docker-build-all       # Build todas las imágenes
+make db-up                  # Solo PostgreSQL local
+make db-down                # Detener PostgreSQL local
+
+# Protobuf
+make generate-proto  # Generar código Python desde .proto
 ```
 
 ## License

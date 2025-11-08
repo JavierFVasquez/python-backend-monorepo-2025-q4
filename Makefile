@@ -142,6 +142,22 @@ docker-down:
 	@echo "Stopping services..."
 	docker-compose down
 
+docker-build-products:
+	@echo "🐳 Building products service Docker image..."
+	docker build -t products-service:latest -f services/products/Dockerfile .
+	@echo "✅ Products service image built successfully!"
+
+docker-build-inventory:
+	@echo "🐳 Building inventory service Docker image..."
+	docker build -t inventory-service:latest -f services/inventory/Dockerfile .
+	@echo "✅ Inventory service image built successfully!"
+
+docker-build-all:
+	@echo "🐳 Building all Docker images..."
+	@$(MAKE) docker-build-products
+	@$(MAKE) docker-build-inventory
+	@echo "✅ All images built successfully!"
+
 # Solo PostgreSQL local para desarrollo
 db-up:
 	@echo "🐳 Starting PostgreSQL local..."

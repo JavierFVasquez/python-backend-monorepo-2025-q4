@@ -34,6 +34,26 @@ sed -i '' 's/from products import products_pb2/from . import products_pb2/g' \
 sed -i '' 's/from products import products_pb2/from . import products_pb2/g' \
   services/inventory/infrastructure/grpc/products/products_pb2_grpc.py
 
+# Crear __init__.py para exponer los módulos generados
+echo "Creating __init__.py files..."
+cat > services/products/infrastructure/grpc/products/__init__.py << 'EOF'
+# Generated protobuf code
+# Expose generated modules for easier importing
+from . import products_pb2
+from . import products_pb2_grpc
+
+__all__ = ['products_pb2', 'products_pb2_grpc']
+EOF
+
+cat > services/inventory/infrastructure/grpc/products/__init__.py << 'EOF'
+# Generated protobuf code
+# Expose generated modules for easier importing
+from . import products_pb2
+from . import products_pb2_grpc
+
+__all__ = ['products_pb2', 'products_pb2_grpc']
+EOF
+
 echo "✅ Protobuf code generated successfully!"
 echo ""
 echo "Generated files:"

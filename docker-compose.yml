@@ -59,7 +59,7 @@ services:
       - "50151:50051"
     environment:
       - API_KEY=${API_KEY}
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/products_db
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/products_db}
       - REDIS_URL=${REDIS_URL}
       - PRODUCTS_SERVICE_PORT=8001
       - PRODUCTS_GRPC_PORT=50051

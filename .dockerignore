@@ -1,0 +1,67 @@
+# Git
+.git
+.gitignore
+.github
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+.eggs
+.pytest_cache
+.mypy_cache
+.ruff_cache
+htmlcov
+.coverage
+coverage.json
+.tox
+.venv
+venv
+env
+
+# Pants
+.pants.d
+dist/
+.pids
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Development files
+poetry.lock
+Makefile
+docker-compose.yml
+
+# Test files (estos ya están copiados en los servicios)
+tests/
+**/tests/
+
+# Seeds (opcional, si no los necesitas en producción)
+**/seeds/
+
+# Environment
+.env
+.env.*
+!.env.example
+env.example
+

@@ -30,9 +30,12 @@ jobs:
         run: |
           pants test ::
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./dist/coverage/python/coverage.json
           fail_ci_if_error: false
           verbose: true
+          flags: unittests
+          name: codecov-umbrella
