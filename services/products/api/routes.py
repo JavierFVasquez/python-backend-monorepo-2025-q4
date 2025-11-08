@@ -244,19 +244,6 @@ async def delete_product(
     await use_case.execute(product_id)
 
 
-async def _list_products_handler(
-    page: int = Query(1, ge=1, description="Page number (starts at 1)"),
-    size: int = Query(10, ge=1, le=100, description="Number of items per page (1-100)"),
-    session: AsyncSession = Depends(get_db_session),
-) -> dict[str, Any]:
-    """Handler compartido para listar productos."""
-    repository = await get_product_repository(session)
-    use_case = ListProducts(repository)
-    products, total = await use_case.execute(page, size)
-    return serialize_products(products, page, size, total)
-
-
-# Registrar ambas rutas: con y sin trailing slash
 @router.get(
     "/",
     dependencies=[Depends(verify_api_key)],
@@ -313,5 +300,8 @@ async def list_products(
     size: int = Query(10, ge=1, le=100, description="Number of items per page (1-100)"),
     session: AsyncSession = Depends(get_db_session),
 ) -> dict[str, Any]:
-    return await _list_products_handler(page, size, session)
+    repository = await get_product_repository(session)
+    use_case = ListProducts(repository)
+    products, total = await use_case.execute(page, size)
+    return serialize_products(products, page, size, total)
 
