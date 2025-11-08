@@ -16,10 +16,11 @@ async def test_get_inventory_success(
     mock_repository.get_by_product_id.return_value = sample_inventory
     use_case = GetInventory(mock_repository, mock_product_service)
 
-    result = await use_case.execute("test-123", "request-123")
+    product, inventory = await use_case.execute("test-123", "request-123")
 
-    assert result.product_id == sample_inventory.product_id
-    assert result.quantity == sample_inventory.quantity
+    assert inventory.product_id == sample_inventory.product_id
+    assert inventory.quantity == sample_inventory.quantity
+    assert product["id"] == "test-123"
     mock_product_service.get_product.assert_called_once_with("test-123", "request-123")
     mock_repository.get_by_product_id.assert_called_once_with("test-123")
 
@@ -45,4 +46,3 @@ async def test_get_inventory_not_found(
 
     with pytest.raises(NotFoundError):
         await use_case.execute("test-123", "request-123")
-

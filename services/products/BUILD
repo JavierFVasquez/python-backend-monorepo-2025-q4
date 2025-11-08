@@ -1,5 +1,9 @@
 python_sources(
     name="products_lib",
+    sources=["**/*.py"],
+    dependencies=[
+        "//libs/common:common",
+    ],
 )
 
 pex_binary(
@@ -7,4 +11,3 @@ pex_binary(
     entry_point="main.py",
     dependencies=[":products_lib"],
 )
-
