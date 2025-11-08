@@ -59,6 +59,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["X-Request-ID"],
+    max_age=3600,  # Cache preflight requests por 1 hora (evita problemas con 307)
 )
 app.add_middleware(RequestIDMiddleware)
 app.add_middleware(ErrorHandlerMiddleware)
