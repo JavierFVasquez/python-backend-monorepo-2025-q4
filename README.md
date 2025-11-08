@@ -5,9 +5,6 @@
 
 A scalable Python monorepo containing two microservices (`products` and `inventory`) built with FastAPI, following hexagonal architecture and JSON:API standard.
 
-## 📊 Coverage Report
-
-View the latest test coverage report: [Coverage Report](https://JavierFVasquez.github.io/python-backend-monorepo-2025-q4/)
 
 ## Architecture Overview
 
@@ -199,9 +196,9 @@ open dist/coverage/python/htmlcov/index.html
 - 🌐 GitHub Pages: Se publica automáticamente en cada push a main/master
 - 📈 Codecov: Dashboard con gráficos históricos y comentarios en PRs
 
-**Ver reportes online:**
-- GitHub Pages: [Coverage Report](https://JavierFVasquez.github.io/python-backend-monorepo-2025-q4/)
-- Codecov: [Dashboard](https://codecov.io/gh/JavierFVasquez/python-backend-monorepo-2025-q4)
+## 📊 Coverage Report
+
+View the latest test coverage report: [Coverage Report](https://app.codecov.io/gh/JavierFVasquez/python-backend-monorepo-2025-q4)
 
 ## 📚 Documentation
 
