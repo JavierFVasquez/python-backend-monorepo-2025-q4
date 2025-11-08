@@ -50,12 +50,22 @@ app = FastAPI(
 )
 
 # CORS configuration - usar variables de entorno en producción
-ALLOWED_ORIGINS = os.getenv("CORS_ORIGINS", "*").split(",")
+CORS_ORIGINS_ENV = os.getenv("CORS_ORIGINS", "")
+
+# Si CORS_ORIGINS está vacío o es "*", permitir todos los orígenes sin credentials
+# Si tiene valores específicos, usar esos y permitir credentials
+if CORS_ORIGINS_ENV and CORS_ORIGINS_ENV != "*":
+    ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ORIGINS_ENV.split(",")]
+    ALLOW_CREDENTIALS = True
+else:
+    # En desarrollo: permitir todos los orígenes sin credentials
+    ALLOWED_ORIGINS = ["*"]
+    ALLOW_CREDENTIALS = False
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
+    allow_credentials=ALLOW_CREDENTIALS,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["X-Request-ID"],
