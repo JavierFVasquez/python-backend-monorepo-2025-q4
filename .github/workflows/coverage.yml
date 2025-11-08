@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [main, master, develop]
 
+# Permisos necesarios para GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  pull-requests: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -30,13 +37,16 @@ jobs:
         run: |
           pants test ::
 
-      - name: Upload coverage report to GitHub Pages
+      - name: Upload coverage to GitHub Pages artifact
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-        uses: peaceiris/actions-gh-pages@v3
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist/coverage/python/htmlcov
-          destination_dir: coverage
+          path: ./dist/coverage/python/htmlcov
+
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        id: deployment
+        uses: actions/deploy-pages@v4
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
@@ -61,5 +71,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `## 📊 Coverage Report\n\nTotal Coverage: **${coverage}%**\n\n[View Full Report](https://${context.repo.owner}.github.io/${context.repo.repo}/coverage/)`
+              body: `## 📊 Coverage Report\n\nTotal Coverage: **${coverage}%**\n\n[View Full Report](https://${context.repo.owner}.github.io/${context.repo.repo}/)`
             });

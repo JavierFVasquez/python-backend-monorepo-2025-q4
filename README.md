@@ -7,7 +7,7 @@ A scalable Python monorepo containing two microservices (`products` and `invento
 
 ## 📊 Coverage Report
 
-View the latest test coverage report: [Coverage Report](https://JavierFVasquez.github.io/python-backend-monorepo-2025-q4/coverage/)
+View the latest test coverage report: [Coverage Report](https://JavierFVasquez.github.io/python-backend-monorepo-2025-q4/)
 
 ## Architecture Overview
 
