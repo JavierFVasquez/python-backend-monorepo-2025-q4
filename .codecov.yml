@@ -1,0 +1,41 @@
+# Codecov Configuration
+# Docs: https://docs.codecov.com/docs/codecov-yaml
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto      # Mantener coverage actual como mínimo
+        threshold: 1%     # Permite 1% de bajada
+        
+    patch:
+      default:
+        target: 50%      # Cambios nuevos deben tener al menos 50% coverage
+        
+  range: 50..100         # Rango de colores (rojo a verde)
+
+comment:
+  layout: "header, diff, files, footer"
+  behavior: default
+  require_changes: false  # Comenta en todos los PRs
+
+# Ignorar archivos generados y tests
+ignore:
+  - "**/*_test.py"
+  - "**/test_*.py"
+  - "**/*_pb2.py"
+  - "**/*_pb2_grpc.py"
+  - "**/tests/**"
+  - "**/conftest.py"
+  - "**/__pycache__/**"
+  - "**/migrations/**"
+  - "**/seeds/**"
+
+# Flags para separar coverage por componente
+flags:
+  unittests:
+    paths:
+      - libs/
+      - services/
+    carryforward: true
+

@@ -197,6 +197,11 @@ open dist/coverage/python/htmlcov/index.html
 - 📊 HTML: `dist/coverage/python/htmlcov/index.html` - Reporte visual interactivo
 - 📄 JSON: `dist/coverage/python/coverage.json` - Datos estructurados
 - 🌐 GitHub Pages: Se publica automáticamente en cada push a main/master
+- 📈 Codecov: Dashboard con gráficos históricos y comentarios en PRs
+
+**Ver reportes online:**
+- GitHub Pages: [Coverage Report](https://JavierFVasquez.github.io/python-backend-monorepo-2025-q4/)
+- Codecov: [Dashboard](https://codecov.io/gh/JavierFVasquez/python-backend-monorepo-2025-q4)
 
 ## 📚 Documentation
 
