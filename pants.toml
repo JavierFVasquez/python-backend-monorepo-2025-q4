@@ -1,0 +1,38 @@
+[GLOBAL]
+pants_version = "2.24.0"
+backend_packages = [
+    "pants.backend.python",
+    "pants.backend.python.lint.black",
+    "pants.backend.python.typecheck.mypy",
+]
+
+[source]
+root_patterns = [
+    "/services",
+    "/libs",
+]
+
+[python]
+interpreter_constraints = [">=3.11,<3.13"]
+enable_resolves = true
+default_resolve = "python-default"
+
+[python.resolves]
+python-default = "3rdparty/python/requirements.txt"
+
+[test]
+use_coverage = true
+
+[coverage-py]
+report = ["console", "html", "json"]
+global_report = true
+
+[black]
+config = "pyproject.toml"
+
+[ruff]
+config = "pyproject.toml"
+
+[mypy]
+config = "pyproject.toml"
+

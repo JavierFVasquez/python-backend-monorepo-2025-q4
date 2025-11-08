@@ -1,0 +1,117 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    ports:
+      - "54321:5432"
+    environment:
+      POSTGRES_DB: products_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: inventory_db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - backend
+
+  products:
+    build:
+      context: .
+      dockerfile: services/products/Dockerfile
+    container_name: products
+    ports:
+      - "8001:8001"
+      - "50051:50051"
+    environment:
+      - API_KEY=${API_KEY}
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/products_db
+      - REDIS_URL=redis://redis:6379/0
+      - PRODUCTS_SERVICE_PORT=8001
+      - PRODUCTS_GRPC_PORT=50051
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - backend
+
+  inventory:
+    build:
+      context: .
+      dockerfile: services/inventory/Dockerfile
+    container_name: inventory
+    ports:
+      - "8002:8002"
+    environment:
+      - API_KEY=${API_KEY}
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_DATABASE=inventory_db
+      - PRODUCTS_GRPC_URL=products:50051
+      - INVENTORY_SERVICE_PORT=8002
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      products:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongodb_data:
+

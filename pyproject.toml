@@ -1,0 +1,84 @@
+[tool.poetry]
+name = "python-backend-monorepo"
+version = "0.1.0"
+description = "Backend monorepo with FastAPI microservices"
+authors = ["Your Team <team@example.com>"]
+readme = "README.md"
+packages = [
+    { include = "services" },
+    { include = "libs" }
+]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+fastapi = "0.109.0"
+uvicorn = {extras = ["standard"], version = "0.27.0"}
+pydantic = "2.6.0"
+pydantic-settings = "2.1.0"
+sqlalchemy = {extras = ["asyncio"], version = "2.0.25"}
+asyncpg = "0.29.0"
+beanie = "1.24.0"
+motor = "3.1.2"
+pymongo = "4.3.3"
+redis = "5.0.1"
+httpx = "0.26.0"
+python-dotenv = "^1.0.0"
+python-json-logger = "2.0.7"
+grpcio = "^1.76.0"
+grpcio-tools = "^1.76.0"
+protobuf = "^6.33.0"
+alembic = "^1.17.1"
+psycopg2-binary = "^2.9.11"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "7.4.4"
+pytest-asyncio = "0.23.3"
+pytest-cov = "4.1.0"
+pytest-mock = "3.12.0"
+black = "24.1.1"
+ruff = "0.1.14"
+mypy = "1.8.0"
+types-redis = "4.6.0.20240106"
+psycopg2-binary = "^2.9.11"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "DTZ", "PIE", "PT", "RET", "SIM", "ARG", "ERA", "PL"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["services", "libs"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--cov=services",
+    "--cov=libs",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-fail-under=80"
+]
+
+[tool.coverage.run]
+source = ["services", "libs"]
+omit = ["*/tests/*", "*/test_*.py"]
+

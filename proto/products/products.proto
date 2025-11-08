@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package products;
+
+// Products Service - gRPC API for inter-service communication
+service ProductsService {
+  // Get a single product by ID
+  rpc GetProduct(GetProductRequest) returns (GetProductResponse);
+  
+  // Check if a product exists
+  rpc ProductExists(ProductExistsRequest) returns (ProductExistsResponse);
+  
+  // List products with pagination
+  rpc ListProducts(ListProductsRequest) returns (ListProductsResponse);
+}
+
+// Request to get a product by ID
+message GetProductRequest {
+  string product_id = 1;
+}
+
+// Response with product details
+message GetProductResponse {
+  Product product = 1;
+}
+
+// Request to check if product exists
+message ProductExistsRequest {
+  string product_id = 1;
+}
+
+// Response for product existence check
+message ProductExistsResponse {
+  bool exists = 1;
+  Product product = 2;  // Optional: product data if exists
+}
+
+// Request to list products
+message ListProductsRequest {
+  int32 page = 1;
+  int32 size = 2;
+}
+
+// Response with list of products
+message ListProductsResponse {
+  repeated Product products = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 size = 4;
+}
+
+// Product entity
+message Product {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string price = 4;  // Decimal as string
+  string created_at = 5;
+  string updated_at = 6;
+}
+
