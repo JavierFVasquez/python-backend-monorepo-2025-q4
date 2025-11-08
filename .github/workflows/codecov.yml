@@ -18,14 +18,17 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Pants
-        run: |
-          curl -L -o ./pants https://pantsbuild.github.io/setup/pants
-          chmod +x ./pants
+      - name: Bootstrap Pants
+        uses: pantsbuild/actions/init-pants@main
+        with:
+          # Cache key suffix to invalidate on changes
+          gha-cache-key: v1
+          # Enable named caches for better performance
+          named-caches-hash: ${{ hashFiles('3rdparty/python/requirements.txt') }}
 
       - name: Run tests with coverage
         run: |
-          make test-pants
+          pants test ::
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
