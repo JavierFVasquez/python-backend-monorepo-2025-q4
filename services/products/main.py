@@ -8,9 +8,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from libs.common.logging import setup_logging
-from libs.common.middleware import ErrorHandlerMiddleware, RequestIDMiddleware
+from libs.common.middleware import (
+    ErrorHandlerMiddleware,
+    RequestIDMiddleware,
+    RequestLoggingMiddleware,
+)
 from services.products.api.dependencies import async_session_maker, engine
-from services.products.api.routes import router as products_router
+from services.products.api.routes_v1 import router as products_router_v1
 from services.products.infrastructure.database.models import Base
 from services.products.infrastructure.grpc.grpc_server import serve_grpc
 from services.products.infrastructure.supabase_repository import SupabaseProductRepository
@@ -77,10 +81,12 @@ app.add_middleware(
     expose_headers=["X-Request-ID"],
     max_age=3600,
 )
+app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(RequestIDMiddleware)
 app.add_middleware(ErrorHandlerMiddleware)
 
-app.include_router(products_router)
+# API v1 routes
+app.include_router(products_router_v1)
 
 
 @app.get("/health")

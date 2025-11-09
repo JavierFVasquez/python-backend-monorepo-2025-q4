@@ -9,8 +9,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from libs.common.logging import setup_logging
-from libs.common.middleware import ErrorHandlerMiddleware, RequestIDMiddleware
-from services.inventory.api.routes import router as inventory_router
+from libs.common.middleware import (
+    ErrorHandlerMiddleware,
+    RequestIDMiddleware,
+    RequestLoggingMiddleware,
+)
+from services.inventory.api.routes_v1 import router as inventory_router_v1
 from services.inventory.infrastructure.database.models import InventoryModel
 
 # Load environment variables
@@ -59,10 +63,12 @@ app.add_middleware(
     expose_headers=["X-Request-ID"],
     max_age=3600,
 )
+app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(RequestIDMiddleware)
 app.add_middleware(ErrorHandlerMiddleware)
 
-app.include_router(inventory_router)
+# API v1 routes
+app.include_router(inventory_router_v1)
 
 
 @app.get("/health")

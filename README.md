@@ -211,6 +211,13 @@ View the latest test coverage report: [Coverage Report](https://app.codecov.io/g
 - Estrategias de testing, caching y logging
 - Distributed tracing con Request IDs
 
+📋 **[TECHNICAL_DECISIONS.md](./TECHNICAL_DECISIONS.md)** - Decisiones técnicas y patrones:
+- Patrones de diseño implementados (Repository, DI, Strategy)
+- Justificación de decisiones arquitectónicas
+- Estrategia de versionado de API
+- Logs estructurados en JSON
+- Propuestas de mejoras para escalabilidad
+
 ### API Documentation
 
 FastAPI genera **automáticamente** documentación OpenAPI/Swagger interactiva para ambos servicios:
@@ -232,13 +239,61 @@ FastAPI genera **automáticamente** documentación OpenAPI/Swagger interactiva p
 - Products gRPC: `localhost:50051`
 - Inventory → Products: comunicación vía gRPC
 
+### API Versioning
+
+Las APIs están versionadas usando URL path prefix (`/api/v1`, `/api/v2`, etc.):
+
+**Current Version (v1):**
+- `POST /api/v1/products` - Create product
+- `GET /api/v1/products` - List products
+- `GET /api/v1/products/{id}` - Get product
+- `PATCH /api/v1/products/{id}` - Update product
+- `DELETE /api/v1/products/{id}` - Delete product
+- `POST /api/v1/inventory` - Create inventory
+- `GET /api/v1/inventory/{id}` - Get inventory
+- `PATCH /api/v1/inventory/{id}` - Update inventory
+
+La arquitectura permite agregar nuevas versiones (v2, v3) sin afectar clientes existentes. Ver **[TECHNICAL_DECISIONS.md](./TECHNICAL_DECISIONS.md)** para detalles.
+
+### Structured Logging
+
+Los logs se generan en formato JSON estructurado con contexto completo:
+
+```json
+{
+  "timestamp": "2025-11-09T10:30:45Z",
+  "level": "INFO",
+  "service": "products",
+  "request_id": "550e8400-e29b-41d4",
+  "message": "Product created successfully",
+  "product_id": "123",
+  "duration_ms": 45.2
+}
+```
+
+**Características:**
+- Request ID propagation para distributed tracing
+- Contexto automático (service, module, function, line)
+- Timing automático con `LogTimer`
+- Integrable con ELK, Datadog, CloudWatch
+
+**Uso básico:**
+```python
+from libs.common.logging import get_logger, LogTimer
+
+logger = get_logger(__name__)
+
+with LogTimer(logger, "create_product"):
+    logger.info("Product created", extra={"product_id": product.id})
+```
+
 ## API Examples
 
 ### Products Service
 
 **Create Product**
 ```bash
-curl -X POST http://localhost:8001/products/ \
+curl -X POST http://localhost:8001/api/v1/products/ \
   -H "X-API-Key: your-secret-api-key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -250,13 +305,13 @@ curl -X POST http://localhost:8001/products/ \
 
 **Get Product**
 ```bash
-curl -X GET http://localhost:8001/products/{product_id} \
+curl -X GET http://localhost:8001/api/v1/products/{product_id} \
   -H "X-API-Key: your-secret-api-key"
 ```
 
 **Update Product**
 ```bash
-curl -X PATCH http://localhost:8001/products/{product_id} \
+curl -X PATCH http://localhost:8001/api/v1/products/{product_id} \
   -H "X-API-Key: your-secret-api-key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -266,13 +321,13 @@ curl -X PATCH http://localhost:8001/products/{product_id} \
 
 **List Products**
 ```bash
-curl -X GET "http://localhost:8001/products/?page=1&size=10" \
+curl -X GET "http://localhost:8001/api/v1/products/?page=1&size=10" \
   -H "X-API-Key: your-secret-api-key"
 ```
 
 **Delete Product**
 ```bash
-curl -X DELETE http://localhost:8001/products/{product_id} \
+curl -X DELETE http://localhost:8001/api/v1/products/{product_id} \
   -H "X-API-Key: your-secret-api-key"
 ```
 
@@ -280,7 +335,7 @@ curl -X DELETE http://localhost:8001/products/{product_id} \
 
 **Create Inventory**
 ```bash
-curl -X POST http://localhost:8002/inventory/ \
+curl -X POST http://localhost:8002/api/v1/inventory/ \
   -H "X-API-Key: your-secret-api-key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -291,13 +346,13 @@ curl -X POST http://localhost:8002/inventory/ \
 
 **Get Inventory**
 ```bash
-curl -X GET http://localhost:8002/inventory/{product_id} \
+curl -X GET http://localhost:8002/api/v1/inventory/{product_id} \
   -H "X-API-Key: your-secret-api-key"
 ```
 
 **Update Inventory (Purchase)**
 ```bash
-curl -X PATCH http://localhost:8002/inventory/{product_id} \
+curl -X PATCH http://localhost:8002/api/v1/inventory/{product_id} \
   -H "X-API-Key: your-secret-api-key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -513,3 +568,6 @@ make generate-proto  # Generar código Python desde .proto
 
 MIT
 
+--- 
+
+_Creado por Javier Vasquez 👽_
